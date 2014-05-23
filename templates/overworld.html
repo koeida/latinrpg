@@ -1,0 +1,70 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>LatinRPG: {{name}}</title>
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
+	<script src="/javascripts/battle.js"></script>
+	<style>
+		body {
+			background-color: #333333;
+		}
+
+		#container {
+			position: relative;
+		}
+
+		#overworld {
+			border: 2px solid yellow;
+		}
+
+		.location {
+			display: block;
+			opacity: .8;
+			position: absolute;
+			z-index: 10;
+			width: 20px;
+			height: 20px;
+			border-radius: 10px;
+			background-color: white;
+			border: 1px solid white;
+		}
+
+		.location:hover {
+			border-color: red;
+		}
+
+		.SecDec {
+			
+		}
+
+	</style>
+	<script>
+		var locations = [
+		['Second Declension','/battle/SecDec', 422, 750],
+		['Fishing','/fish', 360, 630]];
+
+		function displayLocations() {
+			for(var i = 0; i < locations.length; i++) {
+				var l = locations[i];
+				s = "<a href='" + l[1] + "' class='location " + l[1] + "' style='top:" + l[2] + "px; left:" + l[3] + "px;' />"; 
+
+				$("#container").append(s); 
+			}
+		}
+	</script>
+</head>
+	<body onload='displayLocations()'>
+		<div id=container>
+			<div id=sidebar>
+				<a href="/stats">Character Info</a>	
+			</div>
+			<img id=overworld src="/img/overworld.jpg" width=1000px height=640px />
+		</div>
+	</body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" charset="utf-8" type="text/css" href="/css/rpg.css">
+		<script src="/javascripts/prototype.js" charset="utf-8" type="text/javascript"></script>
+		<script src="/javascripts/scriptaculous.js" charset="utf-8" type="text/javascript"></script>
+		<script src="/javascripts/keeg_utils.js" charset="utf-8" type="text/javascript"></script>
+		<script src="/javascripts/underscore.js" charset="utf-8" type="text/javascript"></script>
+		<script src="/javascripts/battle.js" charset="utf-8" type="text/javascript"></script>
+		<style>
+			#streak {
+				font-size: 16px;
+				color: green;
+			}
+		</style>
+	</head>
+	<body onload="newMonster()"><div id=container>
+			<center id=difficulty>difficulty: <br/><span id=easy onclick="changeDifficulty(0)">singular</span> | <span id=hard onclick="changeDifficulty(1)">plural</span></center>
+			<div id=leftbar>
+				<div id=score>Score:</div>
+				<div id=pbar_outline>
+					<div id=pbar_fill></div>
+				</div>
+				<div id=streak></div>
+			</div>
+			<table id=battle width=700px><tr><td>
+				<div id=location>
+					<img src="/img/hit.png" id=monsterhit style="display:none">
+					<img src="/img/heroleft.png" id=hero />
+					<img src="/img/hit.png" id=herohit style="display:none"/>
+				</div>
+				<div id=question><b>In which case(s) is this word?<br/></b></div>
+				<div id=answers>
+				<div id=cent>
+				<fieldset class=case_answers id=singular>
+					<legend>Singular</legend>
+					<div class=answer id=nom onclick="button_clicked(this)">Nominative</div>
+					<div class=answer id=voc onclick="button_clicked(this)">Vocative</div>
+					<div class=answer id=gen onclick="button_clicked(this)">Genitive</div>
+					<div class=answer id=dat onclick="button_clicked(this)">Dative</div>
+					<div class=answer id=acc onclick="button_clicked(this)">Accusative</div>
+					<div class=answer id=abl onclick="button_clicked(this)">Ablative</div>
+				</fieldset>
+				<fieldset class=case_answers id=plural>
+					<legend>Plural</legend>
+					<div class=answer id=nom_pl onclick="button_clicked(this)">Nominative</div>
+					<div class=answer id=voc_pl onclick="button_clicked(this)">Vocative</div>
+					<div class=answer id=gen_pl onclick="button_clicked(this)">Genitive</div>
+					<div class=answer id=dat_pl onclick="button_clicked(this)">Dative</div>
+					<div class=answer id=acc_pl onclick="button_clicked(this)">Accusative</div>
+					<div class=answer id=abl_pl onclick="button_clicked(this)">Ablative</div>
+				</fieldset>
+				</div>			
+				</div>
+				<div id=attack onclick="check_answers()">Attack!</div>
+			</table>
+			<div id="rightbar">Last Question:
+				<div id=lastq></div>
+			</div>
+		</div>
+	</body>
+</html>

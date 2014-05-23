@@ -1,0 +1,158 @@
+body {
+    background-color: #444444;
+}
+table {
+    background-color: #222222;
+    padding: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    float: left;
+    width: 700px;
+}
+
+div#leftbar,div#rightbar {
+	width:155px;
+	background-color: #222222;
+	color: white;
+	float: left;
+	border: 1px solid #777777;
+	padding: 5px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#lastq {
+	text-align: left;
+	font-size: 10px;
+}
+
+h2.missing, h2.wrong { color: red; }
+h2.correct { color: green; }
+ul.wrong li{
+    color: red;
+}
+ul.correct li{
+    color: green;
+}
+
+#pbar_outline {
+	background: black;
+	border: 1px solid #333333;
+	width: 140px;
+	height: 15px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#pbar_fill {
+	background: red;
+	height: 15px;
+	width: 0px;
+}
+
+#container {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	overflow: hidden;
+	width: 1100px;
+}
+
+#difficulty {
+	font-size: 10px;
+	color: #BBBBBB;
+}
+
+span#easy {
+	color: white;
+}
+
+span#hard {
+	
+}
+
+div#location {
+    background-image: url("/img/second_declension.jpg");
+    height: 442px;
+    border: 2px solid #777777;
+}
+div#answers {
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+fieldset.case_answers {
+    float: left;
+    width: 40%;
+    margin-left: 3%;
+    margin-right: 3%;
+    color: white;
+    border: 1px solid white;
+    background: #333333;
+}
+fieldset.case_answers div {
+    border:2px solid orange;
+    color: orange;
+    font-size: 20px;
+    text-align: center;
+    font-family: Times, serif;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+div.answer:hover {
+    background-color: #844302 !important;
+    border: 2px solid orange !important;
+    color: white !important;
+}
+div#question {
+    height: 70px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: #333333;
+    border: 1px solid #777777;
+    color: white;
+    font-size: 25px;
+    font-family: Times, serif;
+    text-align: center;
+}
+.monster {
+    position: absolute;
+    z-index: 5;
+    top: 250px;
+    left: 0px;
+}
+#monsterhit {
+    position: absolute;
+    z-index: 6;
+    top: 345px;
+    left: 530px;
+}
+#hero {
+    position: absolute;
+    z-index: 48;
+    top: 350px;
+    left: 650px;
+}
+#herohit {
+    position: absolute;
+    z-index: 9;
+    top: 360px;
+    left: 615px;
+}
+#attack {
+    color: white;
+    background-color: #490101;
+    font-size: 20px;
+    text-align: center;
+    width: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid red;
+    border-radius: 3px;
+}
+#attack:hover {
+    background-color: #7A0000;
+}
+#cent {
+    margin-left: auto;
+    margin-right: auto;
+}

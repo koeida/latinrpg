@@ -1,0 +1,193 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>LatinRPG: Character Info</title>
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		body {
+			background-color: #3A4452;
+		}
+		h1 {
+			color: white;
+		}
+		#menu,#title {
+			background-color: #67991A;
+		}
+		#main {
+			background-color: #3A4452;
+		}
+
+		.nav li {
+			background-color: #80A735;
+		}
+
+		.nav li a {
+			color: white;
+		}
+		.nav-pills > li > a:hover {
+			background-color: #F2F3F4;
+			color: #3A4452;
+		}
+
+		.nav-pills li.active a {
+			background-color: #A9C670;
+		}
+
+		.nav-pills li.active a:hover {
+			background-color: #A9C670;
+		}
+
+		#avatar {
+			width: 32px;
+			height: 32px;
+			background-image: url('/img/herowalk.png');
+			float: left;
+			margin-top: 16px;
+		}
+		#title {
+		}
+
+
+
+
+		@media (min-width:320px) {
+			h1 {
+				font-size: 14px;
+			}
+			body {
+				font-size: 10px;
+			}
+			div.achievement {
+				margin: 5px;
+				color: white;
+				border: 1px solid #67991A;
+				border-radius: 10px;
+				width: 200px;
+				overflow: hidden;
+				background-color: #80A735;
+				float: left;
+			}
+
+			.incomplete {
+				opacity: .3;
+			}
+
+			.achievement p {
+				float: left;
+				padding-top: 10px;
+				width: 120px;
+			}
+
+			.achievement img {
+				float: left;
+				display: block;
+				padding: 5px;
+				width: 50px;
+				height: 50px;
+			}
+
+			.achievement h2 {
+				background-color: #67991A;
+				font-size: 18px;
+				margin: 0px;
+				padding-left: 10px;
+				padding-top: 5px;
+				padding-bottom: 5px;
+			}
+		}
+		@media (min-width:801px) {
+			h1 {
+				font-size: 24px;
+			}
+			body {
+				font-size: 12px;
+			}
+			div.achievement {
+				margin: 15px;
+				color: white;
+				border: 1px solid #67991A;
+				border-radius: 10px;
+				width: 320px;
+				overflow: hidden;
+				background-color: #80A735;
+				float: left;
+			}
+
+			.incomplete {
+				opacity: .3;
+			}
+
+			.achievement p {
+				float: left;
+				padding-top: 10px;
+				width: 180px;
+			}
+
+			.achievement img {
+				float: left;
+				display: block;
+				padding: 10px;
+				width: 100px;
+				height: 100px;
+			}
+
+			.achievement h2 {
+				background-color: #67991A;
+				font-size: 18px;
+				margin: 0px;
+				padding-left: 10px;
+				padding-top: 5px;
+				padding-bottom: 5px;
+			}
+
+		}
+	</style>
+	<script>
+		function setup() {
+			$('#avatar').sprite({fps:3, no_of_frames:3});
+		}
+		
+		function displayAchievements() {
+			if($("#achievements").attr("class") != "active") {
+				$("#menu").find("li.active").removeClass("active");
+				$("#achievements").addClass("active");
+				$.get('/stats/getAchievementsXml',function(res) {
+					$('#main').append(res);
+				});
+			}
+		}
+	</script>
+</head>
+	<body onload="setup()">
+		<div class=container-fluid>
+			<div id=title class=row>
+				<div class="col-xs-12">
+					<div id=avatar></div>
+					<h1>{{character_name}}</h1>
+				</div>
+			</div>
+			<div class=row>
+				<div id=menu class="col-xs-12">
+					<ul class="nav nav-pills">
+					  <li class="active"><a href="#">Home</a></li>
+					  <li id="achievements"><a href="#" onclick="displayAchievements()">Achievements</a></li>
+					  <li><a href="#">Treasure</a></li>
+					  <li><a href="#">Stats</a></li>
+					</ul>
+					
+				</div>
+			</div>
+			<div class=row>
+				<div id=main class="col-xs-12">
+							
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="/javascripts/jquery.spritely.js"></script>
+</html>

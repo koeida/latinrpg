@@ -1,0 +1,283 @@
+<?php
+	require '/inc/Mustache.php';
+	require '/inc/functional/_import.php';
+	use Functional as F;
+
+	$login = function () {
+		if(isset($_POST['username'])) {
+			$res = sqlSelect("select * from users where username = '".$_POST['username']."'");
+			if(count($res) > 0) {
+				$pwd = $res[0]['password'];
+				if($pwd == $_POST['password']) {
+					$_SESSION['uid'] = $res[0]['id'];
+				}
+			}
+
+		} 
+		if(!isset($_SESSION['uid'])) {
+			renderTemplate("templates/login.html",array());
+		}
+
+	};
+
+	require '/inc/required.php';
+
+	function renderTemplate($file,$data) {
+		$m = new Mustache_Engine(array("escape" => function($v){return $v;}));
+		$template = file_get_contents($file);
+		echo $m->render($template,$data);
+	}
+
+	function renderTemplateNE($file,$data) {
+		$m = new Mustache_Engine;
+		$template = file_get_contents($file);
+		return $m->render($template,$data);
+	}
+
+	function getPoints($uid) {
+		$sql = "select number, point_id from points_users where user_id = '$uid'";
+		$res = sqlSelect($sql);
+		return $res;
+	}
+
+	function concatWith($a,$s) {
+		$res = F\reduce_left($a,function($val,$i,$c,$red) use ($s) {
+			return $red . $s . $val;
+		},"");
+		return substr($res,1);
+	}
+
+	function requirementsSatisfied($points,$colname,$id,$pointsRequirement) {
+		$res = F\First($points, function($x) use ($colname,$id) {return $x[$colname] == $id;});
+		$number = $res['number'];
+		if($number >= $pointsRequirement) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function getAchievementList($uid) {
+		$points = ($uid == '') ? array() : getPoints($uid);
+		$reqs = array(
+				array("id" => 0, "req" => 25, "achievement_id" => 0), //Fishing1 
+				array("id" => 0, "req" => 75, "achievement_id" => 1), //Fishing2
+				array("id" => 1, "req" => 25, "achievement_id" => 2), //EasyMonst
+				array("id" => 2, "req" => 25, "achievement_id" => 3), //HardMonst
+				array("id" => 3, "req" =>  6, "achievement_id" => 4)); //Words1
+		
+		$achievements = array_reduce($reqs,function ($carry,$e) use ($points) {
+			if(requirementsSatisfied($points,'point_id',$e['id'],$e['req'])) {
+				array_push($carry,$e['achievement_id']);
+				return $carry;
+			} else {
+				return $carry;
+			}
+		},array());
+
+		//Get html for completed achievements
+		$sql = "SELECT description, badgeUrl, id, requirements, name FROM quests";
+		$sqlRes = sqlSelect($sql);
+		$res = array_reduce($sqlRes,function ($carry, $e) use ($achievements) {
+			$template = 'templates/displayAchievement.html';
+			$title = $e['name'];
+			$makeTemp = function ($class,$title,$desc,$icon) use ($template) {
+				return renderTemplateNE($template,array(
+					"Class" => $class,
+					"Title" => $title,
+					"Description" => $desc,
+					"IconUrl" => $icon));
+			};
+
+			if(F\contains($achievements,intval($e['id']))) {
+				return $carry . $makeTemp("complete",$title, $e['description'],$e['badgeUrl']);
+			} else {
+				$img = substr($e['badgeUrl'],0,-4)."_no.png";
+				return $carry . $makeTemp("incomplete",$title,$e['requirements'],$img);
+			}
+		},"");
+
+		return $res;
+	}
+
+
+	$stats = function ($params) {
+		if(F\contains($params,"getAchievementsXml")) {
+			echo getAchievementList($_SESSION['uid']);
+		} else {
+			renderTemplate('templates/character.html',$_SESSION);
+		}
+	};
+
+	$battle = function ($params) {
+		renderTemplate('templates/second_declension.html',$_SESSION);
+	};
+
+	$fish = function ($params) {
+		$ABL = 0;
+		$ACC = 1;
+		$fishingData = array(
+			"easy" => array (
+				array("name"=>'in',   "ncase"=>$ABL, "x"=>0,   "y"=> 0),
+				array("name"=>'cum',  "ncase"=>$ABL, "x"=>-55, "y"=> 0),
+				array("name"=>'suprā',"ncase"=>$ACC, "x"=>0,   "y"=>-65),
+				array("name"=>'sub',  "ncase"=>$ABL, "x"=>0,   "y"=>100)),
+			"stuff" => array(
+				array(
+					array("name"=> "malā",   "x"=>100, "y"=>300),
+					array("name"=> "gladiō", "x"=>280, "y"=>227),
+					array("name"=> "pecuniā","x"=>435, "y"=>285)),
+				array(			
+					array("name"=> "malam",   "x"=>100, "y"=>300),
+					array("name"=> "gladium", "x"=>280, "y"=>227),
+					array("name"=> "pecuniam","x"=>435, "y"=>285))),
+			"nouns" => array(
+				array("ABL"=> "malā",   "ACC"=>"malam"),
+				array("ABL"=> "gladiō", "ACC"=>"gladium"),
+				array("ABL"=> "pecuniā","ACC"=>"pecuniam")));
+
+		if(F\contains($params,"checkanswer")) {
+			$prepGuess = urlDecode($params[3]);
+			$nounGuess = urlDecode($params[4]);
+			$currentPrep = $_SESSION['fishing']['currentPrep']['name'];
+			$currentNoun = $_SESSION['fishing']['currentNoun']['name']; 
+			if (($prepGuess == $currentPrep) && ($nounGuess == $currentNoun)) {
+				$newPrep = $fishingData['easy'][rand(0,count($fishingData['easy']) - 1)];
+				$prepName = $newPrep['name'];
+				$prepCase = $newPrep['ncase'];
+				$nounOptions = $fishingData['stuff'][$prepCase];
+				$newNoun = $nounOptions[rand(0,2)];
+				$_SESSION['fishing']['currentPrep'] = $newPrep;
+				$_SESSION['fishing']['currentNoun'] = $newNoun;
+				$fishingData["fishx"] = intval($_SESSION['fishing']['currentNoun']['x']) + intval($_SESSION['fishing']['currentPrep']['x']);
+				$fishingData["fishy"] = intval($_SESSION['fishing']['currentNoun']['y']) + intval($_SESSION['fishing']['currentPrep']['y']);
+				$_SESSION['currentFish'] += 1;
+				echo $fishingData["fishx"].",".$fishingData['fishy'];
+			} else {
+				if($_SESSION['currentFish'] > 0) {
+					$_SESSION['currentFish'] -= 1;
+				}
+				printf("false");
+			}
+		} else {
+			$_SESSION['fishing'] = array();
+			$_SESSION['fishing']['currentFish'] = 0;
+			$newPrep = $fishingData['easy'][rand(0,count($fishingData['easy']) - 1)];
+			$prepName = $newPrep['name'];
+			$prepCase = $newPrep['ncase'];
+			$nounOptions = $fishingData['stuff'][$prepCase];
+			$newNoun = $nounOptions[rand(0,2)];
+			$_SESSION['fishing']['currentPrep'] = $newPrep;
+			$_SESSION['fishing']['currentNoun'] = $newNoun;
+			$fishingData["fishx"] = intval($_SESSION['fishing']['currentNoun']['x']) + intval($_SESSION['fishing']['currentPrep']['x']);
+			$fishingData["fishy"] = intval($_SESSION['fishing']['currentNoun']['y']) + intval($_SESSION['fishing']['currentPrep']['y']);
+			renderTemplate('templates/fishing.html',$fishingData);	
+		}
+	};
+
+	$toplevel = function () {
+		renderTemplate('templates/overworld.html', $_SESSION);
+	};
+
+	function matchToImage($name,$v) {
+		if($v == 'i') {
+			return '<img name="'.$name.'" src="/img/'.$name.'.png" width="250px" />';
+		} else {
+			return $v;
+		}
+	}
+
+	function getNewWord() {
+		$sqlGetPossibleQuestions = 'SELECT word, matching, type from words where id in (select word_id from user_words where user_id = '.$_SESSION['uid'].')';
+		$res = sqlSelect($sqlGetPossibleQuestions);
+
+		$last = (isset($_SESSION['lastNewWord'])) ? $_SESSION['lastNewWord'] : '';
+
+		//Pick random word from list;
+		$wordChoices = F\pluck($res,'word');
+		$word = getRandomFrom($wordChoices,$last);
+		$wordData = F\first($res,function($elem) use ($word) {
+			return $elem['word'] == $word;});
+
+		//Get list of possible wrong answers of same type (noun, adj, etc);
+		$answerChoices = F\select($res,function($elem) use ($wordData) {
+			return $elem['type'] == $wordData['type'];});
+		sort($answerChoices);
+
+		//Generate the set of choices. 
+		
+		$answers = array();
+		
+		array_push($answers,matchToImage($word,$wordData['matching']));
+		for($x = 0; $x < 3; $x++) {
+			do {
+				$selection = getRandomFrom($answerChoices,$word);			
+				$result = matchToImage($selection['word'],$selection['matching']);
+			} while(!(array_search($result,$answers) === false));
+			array_push($answers,$result);
+		}
+
+		shuffle($answers);
+		$_SESSION['lastNewWord'] = $wordData;
+		return array("word" => $word, "answers" => $answers);
+	}
+
+	function getNewWords() {
+		$sqlGetNewWords = 'SELECT id,word,matching,type from words where id not in (select word_id from user_words where user_id = '.$_SESSION['uid'].')';
+		$res = sqlSelect($sqlGetNewWords);
+		if(count($res) >= 3) {
+			$vars = array();
+			for($x = 0; $x < 3; $x++) {
+				array_push($vars,"<b>".$res[$x]['word']."</b><br/>".matchToImage($res[$x]['word'],$res[$x]['matching']));
+				sqlRun("INSERT INTO user_words (user_id,word_id) VALUES (" . $_SESSION['uid'] . "," . $res[$x]['id'] . ')');
+			}
+			renderTemplate('templates/answers.html',array("answers" => $vars));
+		}
+	}
+
+	$words = function ($params) {
+		if(isset($params[2]) && $params[2] == 'check') {
+			$answer = urldecode($params[3]);
+			
+			if(($answer == $_SESSION['lastNewWord']['word']) || ($answer == $_SESSION['lastNewWord']['matching'])) {
+				renderTemplate('templates/newWords.html',getNewWord());
+			} else {
+				echo "FALSE";
+			}
+		} else if (isset($params[2]) && $params[2] == 'currentWord') {			
+			echo $_SESSION['lastNewWord']['word'];
+		} else if (isset($params[2]) && $params[2] == 'getNew') {
+			getNewWords();
+		} else {
+			$vars = getNewWord();
+			renderTemplate('templates/words.html',$vars);
+		}
+	};
+
+	$inventory = function ($params) {
+		$sql = "SELECT * FROM inventory WHERE player_id = ".$_SESSION['pid'];
+		$sqlRes = sqlSelect($sql);
+		
+	};
+
+	if(isset($_SESSION['uid'])) {
+		$path = parse_url($_SERVER['REQUEST_URI'])['path'];
+
+		$matches = array(
+			"/^\/$/" => $toplevel,
+			"/^\/stats/" => $stats,
+			"/^\/battle/" => $battle,
+			"/^\/fish/" => $fish,
+			"/^\/words/" => $words
+		);
+
+		foreach($matches as $key => $value) {
+			if(preg_match($key,$path)) {
+				$path_exp = explode('/',$path);
+				$value(F\tail($path_exp));
+				break;
+			}	
+		} 
+	}
+?>
+

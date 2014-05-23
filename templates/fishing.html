@@ -1,0 +1,251 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>LatinRPG: {{name}}</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script src="javascripts/bootstrap.min.js"></script>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<script src="javascripts/underscore.js"></script>
+	<script src="javascripts/jquery.spritely.js"></script>
+
+	<script>
+		function mapCat(fun, coll) {
+			return cat.apply(null,_.map(coll,fun));
+		}
+
+		var gold = 0;
+
+
+	</script>
+
+	<style>
+		body {
+			background-color: #444444;
+		}
+		.nouns {
+		}
+
+		.container {
+			width: 1000px;
+		}
+
+		.btn-success {
+			width: 400px;
+		}
+		.btn-lg {
+			font-size: 12px;
+		}
+
+		.fish {
+			position: absolute;
+			z-index: 20;
+			width: 61px;
+			height: 58px;
+			background-image: url('img/fish1.png');
+		}
+
+		#fisherman {
+			position: absolute;
+			z-index: 21;
+			width: 41px;
+			height:41px;
+			right: 330px;
+			top: 150px;
+			background-image: url('img/Fishermanleft.png');
+		}
+
+		#splash {
+			position: absolute;
+			z-index: 21;
+			width: 72px;
+			height: 63px;
+			top: 150px;
+			background-image: url('img/splash.png');
+		}
+
+		#lake {
+			position: relative;
+		}
+
+		#score {
+			font-size: 20px;
+			color: yellow;
+		}
+		#cont {
+			width: 1263px;
+		}
+		.tinyfish {
+			position: absolute;
+			z-index: 30;
+			width:10px;
+			height: 10px;
+		}
+
+		.answer {
+			background-color: #777777;
+			border: 1px solid #999999;
+			border-radius: 5px;
+			position: relative;
+			width: 675px;
+		}
+	
+		.navbar {
+			background-color: #777777;
+		}
+
+
+
+	</style>
+
+	<script>
+		var splash = new Audio('/sound/splash.mp3');
+		var buzzer = new Audio('/sound/shortbuzzer.mp3');
+		
+		function randomIntFromInterval(min, max) {
+		    return Math.floor(Math.random() * (max - min + 1) + min);
+		}
+
+		function growFishPile() {
+			var rx = randomIntFromInterval(-15,15);
+			var ry = randomIntFromInterval(-15,15);
+			var pilex = (315 + rx) + "px";
+			var piley = (150 + ry) + "px";
+			$('#lake').append("<img src='img/tinyfish.png' class=tinyfish style='right: " + pilex + ";top:" + piley + ";'>");
+		}
+
+		function displayFish(x,y) {
+			var starty = 250;
+			$('#lake').prepend("<div class=fish style='left: " + 295 + "px; top:" + 250 + "px;'>");
+			var xdiff = x;
+			var ydiff = y - starty;
+			var ydiffstr = (ydiff < 0) ? "-=" : "+=";
+			ydiff = Math.abs(ydiff);
+			$('.fish').animate({left: "+=" + xdiff,top: ydiffstr + ydiff},2000);
+			$('.fish').sprite({fps:16,no_of_frames:8});
+		}
+
+		function checkAnswer() {
+			var selected = $(".active");
+			if(selected.length == 2) {
+				var prep = selected[0].children[0].name;
+				var noun = selected[1].children[0].name;	
+				console.log(prep);
+				var rsp = $.get('/fish/checkanswer/' + prep + "/" + noun,function(res) {
+					console.log(res);
+					if(res.trim() != "false") {
+						var cords = res.split(",");
+						splash.play();
+						$('#fisherman').sprite({fps:8,no_of_frames:4,play_frames:4});
+						$('#lake').prepend("<div id=splash style='left:" + $('.fish')[0].style.left + ";'></div>");
+						$('#splash').sprite({fps:20,no_of_frames:11,play_frames:11});
+						$('.fish').animate({top: "-=800px"},500,function() {
+							$(".fish").remove();
+							$(".fish").destroy();
+							growFishPile();
+							displayFish(cords[0],cords[1]);
+						});
+					} else {
+						buzzer.play();
+						var tinyfishes = $(".tinyfish").length;
+						if(tinyfishes > 0) {
+							function animateList(elem,l) {
+								if(l.length != 0) {
+									var anim = _.first(l);
+									elem.animate(anim[0],anim[1],function() {animateList(elem,_.rest(l));});
+								} else {
+									elem.remove();
+								}
+							}
+							
+							var f = $($(".tinyfish")[0])
+							animateList(f,[
+								[{top: "-=15px", left: "-=15px"},100],
+								[{top: "+=15px", left: "-=15px"},100],
+								[{top: "-=15px", left: "-=15px"},100],
+								[{top: "+=20px", left: "-=15px"},100]]);
+						}
+
+					}
+				});
+			}
+
+		}
+
+		function setUp() {
+			var fishX = {{fishx}};
+			var fishY = {{fishy}};
+			//$('#fisherman').sprite({fps:8,no_of_frames:4,play_frames:4,rewind:true});
+			displayFish(fishX,fishY);
+		}
+
+		function getFishData() {
+			var fishStatusResponse = $.get('/fish/getPoints', function(res) {
+			var fishStatusResponse = res.split(',');
+			var totalFish = parseInt(fishStatusResponse[0]);
+			var newFish = parseInt(fishStatusResponse[1]);
+			$('#goodbye_text').append(
+				"Capiēbas <span class=numresult>" + 
+				newFish +
+				"</span> piscēs!  Nunc habeō <span class=numresult>" + 
+				(totalFish + newFish) + 
+				"</span> piscēs!");	
+			});
+	}
+	</script>
+
+	</head>
+	<body onload="setUp()">
+		<div id=cont>
+			<center>
+				<div id=lake>
+					<img src="img/fishingbg.jpg">
+					<div id=fisherman></div>
+				</div>
+			<div class=answer>
+				<div class="btn-group" data-toggle="buttons">
+				{{#easy}}
+					<label class="btn btn-lg btn-primary">
+						<input type="radio" name="{{name}}" case="{{case}}">
+						{{name}}
+					</label>
+				{{/easy}}
+				</div>
+				<div class="btn-group" data-toggle="buttons">
+					{{#nouns}}
+					<label class="btn btn-lg btn-danger nouns accs">
+						<input type="radio" name="{{ACC}}" case=1>{{ACC}}</label>
+					<label class="btn btn-lg btn-danger nouns">
+						<input type="radio" name="{{ABL}}" case=1>{{ABL}}</label>
+					{{/nouns}}
+				</div>
+				<button type=button class="btn btn-success btn-lg btn-block" onClick="checkAnswer()">Get Fish!</button>
+			</div>
+		</center>
+	</div>
+	<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+	<center>
+			<button data-toggle="modal" onclick='getFishData()' data-target="#goodbye" class="btn btn-default">Stop Fishin'</button>
+		</center>
+	</nav>
+<div class="modal fade" id="goodbye" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Gratias!</h4>
+      </div>
+      <div id=goodbye_text class="modal-body">
+	      <img class=av_head src="img/fisherwoman_head.png"/>
+      </div>
+      <div class="modal-footer">
+        <a href="/fish/done" role="button" class="btn btn-default">Vale!</a>
+      </div>
+    </div>
+  </div>
+</div>
+	
+	</body>
+</html>

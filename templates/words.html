@@ -1,0 +1,156 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>LatinRPG: {{name}}</title>
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		.answer {
+			font-size: 50px;
+			width: 400px;
+			height: 400px;
+			margin-right: 10px;
+			margin-top: 10px;
+		}
+
+		.title {
+			background-color: #67991A;
+			height: 50px;
+		}
+
+		.answers {
+		}
+
+		body {
+			background-color: #3A4452;
+		}
+
+		h1 {
+			font-size: 35px !important;
+			margin: 5px !important;
+			padding: 5px !important;
+		}
+
+		#dancer {
+			position: absolute;
+			left: 50px;
+			top: 75px;
+			height: 106px;
+		      	width: 110px; /* 28 frames */
+			background-image: url('/img/dancer.png');
+		}
+
+		.btn:hover {
+			background-color: #ffe794; !important
+		}
+
+		#points {
+			position: absolute;
+			right: 100px;
+			top: 75px;
+			height: 150px;
+			width: 120px;
+			font-size: 25px;
+			color: #ffe794;
+		}
+
+
+	</style>
+	<script>
+		var points = 0;
+		var buzzer = new Audio('/sound/shortbuzzer.mp3');
+		var ding = new Audio('/sound/ding.mp3');
+
+		function updatePoints() {
+			$("#points").empty();
+			$("#points").append("Points: " + points);
+		}
+		function checkAnswer(button) {
+			var guess = "";
+			if(button.children.length > 0) {
+				//image
+				guess = button.children[0].name;
+			} else {
+				//text
+				guess = button.innerHTML;
+			}
+			
+			$.get("/words/check/" + guess,function(data) {
+				if(data.slice(0,5) != "FALSE") {
+					$('#dancer').sprite({fps: 28, no_of_frames: 28, play_frames: 56});
+					$('.answer').remove();
+					$('#word').empty();
+					$.get('/words/currentWord',function(r) {
+						console.log(r);
+						$('#word').append(r);
+					});
+					$($('.answers')[0]).append(data);	
+					points = points + 1;
+					updatePoints();
+					ding.play();
+				} else {
+					if(points > 0) {
+						points = points - 1;
+						buzzer.play();
+						updatePoints();
+					}	
+				}
+			});
+		}
+
+		function getNewWords() {
+			$.get("/words/getNew", function(data) {
+				$(".modal-body").empty();
+				$(".modal-body").append(data);
+			});
+		}
+	</script>
+</head>
+	<body onload=''>
+		<div class=container-fluid>
+			<div class="row title">
+				<div class="col-md-12">
+					<center><h1 id=word>{{word}}</h1></center>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div class="btn-group answers">
+					<center>
+						{{#answers}}
+						<button type=button class="btn btn-default answer" onclick="checkAnswer(this)">{{.}}</button>
+						{{/answers}}
+					</center>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<center><button type=button class="btn btn-primary" onclick="getNewWords()" data-toggle="modal" data-target="#newWordModal">Get More Words</button></center>
+				</div>
+			</div>
+			<div id=dancer></div>
+			<div id=points>Points: 0</div>
+			<div class="modal fade" id="newWordModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog modal-lg">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			      </div>
+			      <div class="modal-body">
+			      </div>
+			      <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">OK!</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+			
+		</div>
+	</body>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="/javascripts/bootstrap.min.js"></script>
+	<script src="/javascripts/jquery.spritely.js"></script>
+</html>
