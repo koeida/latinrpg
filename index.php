@@ -151,26 +151,38 @@
 				$_SESSION['fishing']['currentNoun'] = $newNoun;
 				$fishingData["fishx"] = intval($_SESSION['fishing']['currentNoun']['x']) + intval($_SESSION['fishing']['currentPrep']['x']);
 				$fishingData["fishy"] = intval($_SESSION['fishing']['currentNoun']['y']) + intval($_SESSION['fishing']['currentPrep']['y']);
-				$_SESSION['currentFish'] += 1;
+				$_SESSION['fishing']['currentFish'] += 1;
 				echo $fishingData["fishx"].",".$fishingData['fishy'];
 			} else {
-				if($_SESSION['currentFish'] > 0) {
-					$_SESSION['currentFish'] -= 1;
+				if($_SESSION['fishing']['currentFish'] > 0) {
+					$_SESSION['fishing']['currentFish'] -= 1;
 				}
 				printf("false");
 			}
 		} else {
-			$_SESSION['fishing'] = array();
-			$_SESSION['fishing']['currentFish'] = 0;
+			//SET UP GAME
+
+			//Determine preposition
 			$newPrep = $fishingData['easy'][rand(0,count($fishingData['easy']) - 1)];
 			$prepName = $newPrep['name'];
 			$prepCase = $newPrep['ncase'];
+
+			//Determine noun
 			$nounOptions = $fishingData['stuff'][$prepCase];
 			$newNoun = $nounOptions[rand(0,2)];
+
+			//Initialize Session
+			$_SESSION['fishing'] = array();
+			$_SESSION['fishing']['currentFish'] = 0;
 			$_SESSION['fishing']['currentPrep'] = $newPrep;
 			$_SESSION['fishing']['currentNoun'] = $newNoun;
-			$fishingData["fishx"] = intval($_SESSION['fishing']['currentNoun']['x']) + intval($_SESSION['fishing']['currentPrep']['x']);
-			$fishingData["fishy"] = intval($_SESSION['fishing']['currentNoun']['y']) + intval($_SESSION['fishing']['currentPrep']['y']);
+
+			$nounX = $_SESSION['fishing']['currentNoun']['x'];
+			$prepX = $_SESSION['fishing']['currentPrep']['x'];
+			$nounY = $_SESSION['fishing']['currentNoun']['y'];
+			$prepY = $_SESSION['fishing']['currentPrep']['y'];
+			$fishingData["fishx"] = intval($nounX) + intval($prepX);
+			$fishingData["fishy"] = intval($nounY) + intval($prepY);
 			renderTemplate('templates/fishing.html',$fishingData);	
 		}
 	};
