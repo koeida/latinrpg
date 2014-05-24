@@ -122,17 +122,9 @@
 			$currentPrep = $_SESSION['fishing']['currentPrep']['name'];
 			$currentNoun = $_SESSION['fishing']['currentNoun']['name']; 
 			if (($prepGuess == $currentPrep) && ($nounGuess == $currentNoun)) {
-				$newPrep = $fishingData['easy'][rand(0,count($fishingData['easy']) - 1)];
-				$prepName = $newPrep['name'];
-				$prepCase = $newPrep['ncase'];
-				$nounOptions = $fishingData['stuff'][$prepCase];
-				$newNoun = $nounOptions[rand(0,2)];
-				$_SESSION['fishing']['currentPrep'] = $newPrep;
-				$_SESSION['fishing']['currentNoun'] = $newNoun;
-				$fishingData["fishx"] = intval($_SESSION['fishing']['currentNoun']['x']) + intval($_SESSION['fishing']['currentPrep']['x']);
-				$fishingData["fishy"] = intval($_SESSION['fishing']['currentNoun']['y']) + intval($_SESSION['fishing']['currentPrep']['y']);
 				$_SESSION['fishing']['currentFish'] += 1;
-				echo $fishingData["fishx"].",".$fishingData['fishy'];
+				$newData = newFishingRound($fishingData);
+				echo $newData["fishx"].",".$newData['fishy'];
 			} else {
 				if($_SESSION['fishing']['currentFish'] > 0) {
 					$_SESSION['fishing']['currentFish'] -= 1;
