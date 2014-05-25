@@ -1,4 +1,5 @@
 <?php
+require '/inc/db.php';
 function checkLogin() {
 	global $DBURL, $DBID, $DBPW, $DBNAME,$login;
 	$con = mysqli_connect($DBURL,$DBID,$DBPW,$DBNAME);
