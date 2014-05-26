@@ -292,7 +292,7 @@
 		$path = parse_url($_SERVER['REQUEST_URI'])['path'];
 
 		$matches = array(
-			"/^\/$/" => $toplevel,
+			"/^\/$/" => $stats,
 			"/^\/stats/" => $stats,
 			"/^\/battle/" => $battle,
 			"/^\/fish/" => $fish,
