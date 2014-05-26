@@ -112,6 +112,19 @@
 	};
 
 	$battle = function ($params) {
+		function addBattleRewards($isEasy) {
+			$pointId = ($isEasy) ? 1 : 2;
+			$trinketsGiven = ($isEasy) ? 1 : 2;
+			$updateKillCountSql = "CALL increment_points (".$_SESSION['uid'].",".$pointId.",1)";
+			$updateTrinketCountSql = "CALL increment_currency ($trinketsGiven,".$_SESSION['uid'].",2)";
+			sqlRun($updateKillCountSql);
+			sqlRun($updateTrinketCountSql);
+		}
+		if(F\contains($params,"killeasy")) {
+			addBattleRewards(true);
+		} else if (F\contains($params,"killhard")) {
+			addBattleRewards(false);
+		}
 		renderTemplate('templates/second_declension.html',$_SESSION);
 	};
 
@@ -131,6 +144,15 @@
 				}
 				printf("false");
 			}
+		} else if (F\contains($params,"getPoints")) {
+			//return total, currentCaught
+			$currentCaught = $_SESSION['fishing']['currentFish'];
+			$updateTotalSql = "CALL increment_currency(".$currentCaught.",".$_SESSION['uid'].",1)";
+			sqlRun($updateTotalSql);
+			$getTotalSql = "SELECT amount FROM users_currencies WHERE user_id = ".$_SESSION['uid']." AND currency_id = 1";
+			$totalRes = sqlSelect($getTotalSql);
+			$total = $totalRes[0]['amount'];
+			echo $total.",".$currentCaught;
 		} else {
 			$_SESSION['fishing'] = array();
 			$_SESSION['fishing']['currentFish'] = 0;

@@ -15,6 +15,7 @@
 			var easyMonster = {
 				hp: 10,
 				xp: 10,
+				isHard: false,
 				question: function() pickNewWord(0),
 				success: function(a) isCorrect(), 
 				hitSound: new Audio("/sound/hit.mp3"),
@@ -25,6 +26,7 @@
 			var hardMonster = {
 				hp: 10,
 				xp: 10,
+				isHard: true,
 				question: function() pickNewWord(1),
 				success: function(a) isCorrect(), 
 				hitSound: new Audio("/sound/hit.mp3"),
@@ -245,6 +247,14 @@
 					monster_struck_effects();
 					if(currentMonster.hp <= 0) {
 						currentMonster.deathAnim();
+						var xmlhttp = new XMLHttpRequest();
+						//Increment number of kills/trinkets
+						if(currentMonster.isHard) {
+							xmlhttp.open("POST","/battle/killhard");
+						} else {
+							xmlhttp.open("POST","/battle/killeasy");
+						}
+						xmlhttp.send();
 						setTimeout(function() {newMonster();},2000);
 					}
 					if(score > 1000) { score = 1000; tada.play(); }
