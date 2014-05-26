@@ -49,7 +49,7 @@
 
 		#points {
 			position: absolute;
-			right: 100px;
+			right: 80px;
 			top: 75px;
 			height: 150px;
 			width: 120px;
@@ -65,8 +65,11 @@
 		var ding = new Audio('/sound/ding.mp3');
 
 		function updatePoints() {
-			$("#points").empty();
-			$("#points").append("Points: " + points);
+			$.get('/words/getGold',function(r) {
+				console.log(r);
+				$("#points").empty();
+				$("#points").append("Gold: " + r);
+			});
 		}
 		function checkAnswer(button) {
 			var guess = "";
@@ -109,7 +112,7 @@
 		}
 	</script>
 </head>
-	<body onload=''>
+	<body onload='updatePoints()'>
 		<div class=container-fluid>
 			<div class="row title">
 				<div class="col-md-12">
@@ -133,7 +136,7 @@
 				</div>
 			</div>
 			<div id=dancer></div>
-			<div id=points>Points: 0</div>
+			<div id=points></div>
 			<div class="modal fade" id="newWordModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 			  <div class="modal-dialog modal-lg">
 			    <div class="modal-content">

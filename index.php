@@ -106,6 +106,8 @@
 	$stats = function ($params) {
 		if(F\contains($params,"getAchievementsXml")) {
 			echo getAchievementList($_SESSION['uid']);
+		} else if(F\contains($params,"getTreasure")) {
+			echo '<h1>TREASURE</h1>';
 		} else {
 			renderTemplate('templates/character.html',$_SESSION);
 		}
@@ -177,6 +179,7 @@
 		$res = sqlSelect($sqlGetPossibleQuestions);
 
 		$last = (isset($_SESSION['lastNewWord'])) ? $_SESSION['lastNewWord'] : '';
+		$_SESSION['wordcount'] = count($res);
 
 		//Pick random word from list;
 		$wordChoices = F\pluck($res,'word');
@@ -210,6 +213,7 @@
 	function getNewWords() {
 		$sqlGetNewWords = 'SELECT id,word,matching,type from words where id not in (select word_id from user_words where user_id = '.$_SESSION['uid'].')';
 		$res = sqlSelect($sqlGetNewWords);
+		$_SESSION['wordcount'] = count($res);
 		if(count($res) >= 3) {
 			$vars = array();
 			for($x = 0; $x < 3; $x++) {
@@ -220,11 +224,22 @@
 		}
 	}
 
+	function getGold($uid) {
+		$sqlGetGold = 'SELECT amount FROM users_currencies WHERE currency_id = 0 and user_id = '.$uid;
+		$res = sqlSelect($sqlGetGold);
+		return intval($res[0]['amount']);
+	}
+
 	$words = function ($params) {
 		if(isset($params[2]) && $params[2] == 'check') {
 			$answer = urldecode($params[3]);
 			
 			if(($answer == $_SESSION['lastNewWord']['word']) || ($answer == $_SESSION['lastNewWord']['matching'])) {
+				//increment gold
+				$amountToIncrement = intval($_SESSION['wordcount'] / 3);
+				$sqlIncrementGold = "CALL increment_currency(".$amountToIncrement.",".$_SESSION['uid'].",0)";
+				sqlRun($sqlIncrementGold);
+
 				renderTemplate('templates/newWords.html',getNewWord());
 			} else {
 				echo "FALSE";
@@ -233,6 +248,8 @@
 			echo $_SESSION['lastNewWord']['word'];
 		} else if (isset($params[2]) && $params[2] == 'getNew') {
 			getNewWords();
+		} else if (isset($params[2]) && $params[2] == 'getGold') {
+			echo getGold($_SESSION['uid']);
 		} else {
 			$vars = getNewWord();
 			renderTemplate('templates/words.html',$vars);
