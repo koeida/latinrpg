@@ -7,10 +7,10 @@
 {{/treasures}}
 
 <div class=decorations>
-	<h2>Decorations</h2>
+	<h2>Decorations: Click <a onclick="newDecGp()" href="#">here</a> to buy another (200gp)</h2>
 	{{#decorations}}
 <div class=decwrap>
-	<div class=decoration style='background: url(img/gp_dec.png) {{x}}px {{y}}px; float: left; width: 24px; height:24px'></div> 
+	<div class=decoration title="{{name}}: {{description}}" style='background: url(img/gp_dec.png) {{x}}px {{y}}px; float: left; width: 24px; height:24px'></div> 
 </div>
 {{/decorations}}
 </div>

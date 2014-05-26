@@ -199,6 +199,16 @@
 				});
 			}
 		}
+
+		function newDecGp() {
+			$.get('/stats/newDecGp', function(r) {
+				console.log(r);	
+			});
+			$.get('/stats/getTreasure',function(res) {
+				$('#main').empty();
+				$('#main').append(res);
+			});
+		}
 	</script>
 </head>
 	<body onload="setup()">
