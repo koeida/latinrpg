@@ -109,7 +109,15 @@
 		} else if(F\contains($params,"getTreasure")) {
 			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
 			$res = sqlSelect($sqlTreasure);
-			renderTemplate('templates/treasure.html',array('treasures' => $res));
+
+			$sqlDecorations = 'SELECT name,description,x,y FROM decorations WHERE id in (select decoration_id from users_decorations where user_id = '.$_SESSION['uid'].')';
+			$decRes = sqlSelect($sqlDecorations);
+			for($r = 0; $r < count($decRes); $r++) {
+				$decRes[$r]['x'] *= -24;
+				$decRes[$r]['y'] *= -24;
+			}
+
+			renderTemplate('templates/treasure.html',array('treasures' => $res, 'decorations' => $decRes));
 		} else {
 			renderTemplate('templates/character.html',$_SESSION);
 		}
