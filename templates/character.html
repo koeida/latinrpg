@@ -106,7 +106,7 @@
 			body {
 				font-size: 12px;
 			}
-			div.achievement {
+			div.achievement, div.treasure, div.decorations {
 				margin: 15px;
 				color: white;
 				border: 1px solid #67991A;
@@ -121,10 +121,10 @@
 				opacity: .3;
 			}
 
-			.achievement p {
+			.achievement p, .treasure p {
 				float: left;
 				padding-top: 10px;
-				width: 180px;
+				width: 200px;
 			}
 
 			.achievement img {
@@ -135,13 +135,40 @@
 				height: 100px;
 			}
 
-			.achievement h2 {
+			.treasure img {
+				float: left;
+				display: block;
+				padding:10px;
+			}
+
+			.achievement h2, .treasure h2, .decorations h2 {
 				background-color: #67991A;
 				font-size: 18px;
 				margin: 0px;
 				padding-left: 10px;
 				padding-top: 5px;
 				padding-bottom: 5px;
+			}
+
+			div.decorations {
+				width: 85%;
+				height: 100%;
+				float: left;
+			}
+
+
+			.decwrap {
+				position: relative;
+				float: left;
+				margin:5px;
+				width: 24px;
+				height: 24px;
+			}
+
+			.decoration {
+				position: absolute;
+				width: 24px;
+				height: 24px;
 			}
 
 		}
@@ -156,6 +183,18 @@
 				$("#menu").find("li.active").removeClass("active");
 				$("#achievements").addClass("active");
 				$.get('/stats/getAchievementsXml',function(res) {
+					$('#main').empty();
+					$('#main').append(res);
+				});
+			}
+		}
+
+		function displayTreasure() {
+			if($("#treasure").attr("class") != "active") {
+				$("#menu").find("li.active").removeClass("active");
+				$("#treasure").addClass("active");
+				$.get('/stats/getTreasure',function(res) {
+					$('#main').empty();
 					$('#main').append(res);
 				});
 			}
@@ -175,7 +214,7 @@
 					<ul class="nav nav-pills">
 					  <li class="active"><a href="#">Home</a></li>
 					  <li id="achievements"><a href="#" onclick="displayAchievements()">Achievements</a></li>
-					  <li><a href="#">Treasure</a></li>
+						<li id="treasure"><a href="#" onclick="displayTreasure()">Treasure</a></li>
 					  <li><a href="#">Stats</a></li>
 					</ul>
 					

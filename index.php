@@ -107,7 +107,9 @@
 		if(F\contains($params,"getAchievementsXml")) {
 			echo getAchievementList($_SESSION['uid']);
 		} else if(F\contains($params,"getTreasure")) {
-			echo '<h1>TREASURE</h1>';
+			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
+			$res = sqlSelect($sqlTreasure);
+			renderTemplate('templates/treasure.html',array('treasures' => $res));
 		} else {
 			renderTemplate('templates/character.html',$_SESSION);
 		}
