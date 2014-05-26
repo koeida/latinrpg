@@ -106,6 +106,8 @@
 	$stats = function ($params) {
 		if(F\contains($params,"getAchievementsXml")) {
 			echo getAchievementList($_SESSION['uid']);
+		} else if(F\contains($params,"home")) {			
+			renderTemplate("templates/home.html",array());
 		} else if(F\contains($params,"newDecGp")) {			
 			$sqlGold = "select amount from users_currencies where currency_id = 0 and user_id = ".$_SESSION['uid'];
 			$sqlPossibleNewDecorations = "select * from decorations where id not in (select decoration_id from users_decorations where user_id = ".$_SESSION['uid'].")";

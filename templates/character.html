@@ -171,29 +171,33 @@
 				height: 24px;
 			}
 
-		}
+			div.games div {
+				color: white;
+				margin: 20px;
+				text-align: center;
+				padding-top: 40px;
+				border-radius: 100px;
+				width: 100px;
+				height: 100px;
+				background-color: #80A735
+			}			
+
+			div.games div:hover {
+				color: #3A4452;
+				background-color: white;
+			}
 	</style>
 	<script>
 		function setup() {
 			$('#avatar').sprite({fps:3, no_of_frames:3});
-		}
-		
-		function displayAchievements() {
-			if($("#achievements").attr("class") != "active") {
-				$("#menu").find("li.active").removeClass("active");
-				$("#achievements").addClass("active");
-				$.get('/stats/getAchievementsXml',function(res) {
-					$('#main').empty();
-					$('#main').append(res);
-				});
-			}
+			activateMenu("#home","/stats/home");
 		}
 
-		function displayTreasure() {
-			if($("#treasure").attr("class") != "active") {
+		function activateMenu(id,getUri) {
+			if($(id).attr("class") != "active") {
 				$("#menu").find("li.active").removeClass("active");
-				$("#treasure").addClass("active");
-				$.get('/stats/getTreasure',function(res) {
+				$(id).addClass("active");
+				$.get(getUri,function(res) {
 					$('#main').empty();
 					$('#main').append(res);
 				});
@@ -222,17 +226,15 @@
 			<div class=row>
 				<div id=menu class="col-xs-12">
 					<ul class="nav nav-pills">
-					  <li class="active"><a href="#">Home</a></li>
-					  <li id="achievements"><a href="#" onclick="displayAchievements()">Achievements</a></li>
-						<li id="treasure"><a href="#" onclick="displayTreasure()">Treasure</a></li>
+						<li class="active"><a href="#" onclick="activateMenu('#home','/stats/home')">Home</a></li>
+					  <li id="achievements"><a href="#" onclick="activateMenu('#achievements','/stats/getAchievementsXml')">Achievements</a></li>
+						<li id="treasure"><a href="#" onclick="activateMenu('#treasure','/stats/getTreasure')">Treasure</a></li>
 					  <li><a href="#">Stats</a></li>
 					</ul>
-					
 				</div>
 			</div>
 			<div class=row>
 				<div id=main class="col-xs-12">
-							
 				</div>
 			</div>
 		</div>
