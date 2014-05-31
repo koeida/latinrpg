@@ -19,7 +19,6 @@
 		if(!isset($_SESSION['uid'])) {
 			renderTemplate("templates/login.html",array());
 		}
-
 	};
 
 	require '/inc/required.php';
@@ -102,7 +101,6 @@
 		return $res;
 	}
 
-
 	$stats = function ($params) {
 		if(F\contains($params,"getAchievementsXml")) {
 			echo getAchievementList($_SESSION['uid']);
@@ -114,35 +112,25 @@
 			$goldRes = sqlSelect($sqlGold);
 			$gp = intval($goldRes[0]['amount']);
 			$newDecRes = sqlSelect($sqlPossibleNewDecorations);
-			if ($gp < 200 || count($newDecRes) == 0) {
+			$decorationCost = $decorationCost;
+			if ($gp < $decorationCost || count($newDecRes) == 0) {
 				echo "FALSE";
 			} else {
 				$newDec = getRandomFrom($newDecRes,null);
 				sqlRun("INSERT INTO users_decorations (user_id, decoration_id) VALUES (".$_SESSION['uid'].",".$newDec['id'].")");
-				sqlRun("CALL increment_currency(-200,".$_SESSION['uid'].",0)");
+				sqlRun("CALL increment_currency(-".$decorationCost.",".$_SESSION['uid'].",0)");
 				echo "TRUE";
 			}
-		} else if(F\contains($params,"getAllTreasure")) {
-			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
-			$res = sqlSelect($sqlTreasure);
-
-			$sqlDecorations = 'SELECT name,description,x,y FROM decorations'; 
-			$decRes = sqlSelect($sqlDecorations);
-			for($r = 0; $r < count($decRes); $r++) {
-				$decRes[$r]['x'] *= -24;
-				$decRes[$r]['y'] *= -24;
-			}
-
-			renderTemplate('templates/treasure.html',array('treasures' => $res, 'decorations' => $decRes));
 		} else if(F\contains($params,"getTreasure")) {
 			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
 			$res = sqlSelect($sqlTreasure);
-
-			$sqlDecorations = 'SELECT name,description,x,y FROM decorations WHERE id in (select decoration_id from users_decorations where user_id = '.$_SESSION['uid'].')';
+			$sqlDecorations = 'SELECT name,description,(x * -24),(y * -24) FROM decorations WHERE id in (select decoration_id from users_decorations where user_id = '.$_SESSION['uid'].')';
 			$decRes = sqlSelect($sqlDecorations);
+			$decorationSize = -24;
+
 			for($r = 0; $r < count($decRes); $r++) {
-				$decRes[$r]['x'] *= -24;
-				$decRes[$r]['y'] *= -24;
+				$decRes[$r]['x'] *= $decorationSize;
+				$decRes[$r]['y'] *= $decorationSize;
 			}
 
 			renderTemplate('templates/treasure.html',array('treasures' => $res, 'decorations' => $decRes));
@@ -175,6 +163,7 @@
 			$nounGuess = urlDecode($params[4]);
 			$currentPrep = $_SESSION['fishing']['currentPrep']['name'];
 			$currentNoun = $_SESSION['fishing']['currentNoun']['name']; 
+
 			printf(checkFishingAnswer($prepGuess,$nounGuess,$currentPrep,$currentNoun));
 		} else if (F\contains($params,"getPoints")) {
 			//return total, currentCaught
@@ -223,7 +212,6 @@
 		sort($answerChoices);
 
 		//Generate the set of choices. 
-		
 		$answers = array();
 		
 		array_push($answers,matchToImage($word,$wordData['matching']));

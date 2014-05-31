@@ -1,5 +1,8 @@
 <?php
 require '/inc/db.php';
+require '/inc/functional/_import.php';
+use Functional as F;
+
 function checkLogin() {
 	global $DBURL, $DBID, $DBPW, $DBNAME,$login;
 	$con = mysqli_connect($DBURL,$DBID,$DBPW,$DBNAME);
@@ -57,4 +60,15 @@ function generate($f,$times) {
 	}
 	return $result;
 }
+
+function mapDict($d,$key,$f) {
+	return F\map($d,function ($a) use ($key,$f){
+		if(array_key_exists($key,$a)) {
+			$val = $a[$key];
+			$a[$key] = $f($val);
+		}
+		return $a;
+	});
+}
+
 ?>
