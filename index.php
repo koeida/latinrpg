@@ -112,7 +112,7 @@
 			$goldRes = sqlSelect($sqlGold);
 			$gp = intval($goldRes[0]['amount']);
 			$newDecRes = sqlSelect($sqlPossibleNewDecorations);
-			$decorationCost = $decorationCost;
+			$decorationCost = 200;
 			if ($gp < $decorationCost || count($newDecRes) == 0) {
 				echo "FALSE";
 			} else {
@@ -124,14 +124,9 @@
 		} else if(F\contains($params,"getTreasure")) {
 			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
 			$res = sqlSelect($sqlTreasure);
-			$sqlDecorations = 'SELECT name,description,(x * -24),(y * -24) FROM decorations WHERE id in (select decoration_id from users_decorations where user_id = '.$_SESSION['uid'].')';
-			$decRes = sqlSelect($sqlDecorations);
 			$decorationSize = -24;
-
-			for($r = 0; $r < count($decRes); $r++) {
-				$decRes[$r]['x'] *= $decorationSize;
-				$decRes[$r]['y'] *= $decorationSize;
-			}
+			$sqlDecorations = 'SELECT name,description,(x * '.$decorationSize.') as x,(y * '.$decorationSize.') as y FROM decorations WHERE id in (select decoration_id from users_decorations where user_id = '.$_SESSION['uid'].')';
+			$decRes = sqlSelect($sqlDecorations);
 
 			renderTemplate('templates/treasure.html',array('treasures' => $res, 'decorations' => $decRes));
 		} else {
