@@ -12,5 +12,16 @@
 			$this->AssertEquals(false,$result);
 			$this->AssertEquals(9,$_SESSION['fishing']['currentFish']);
 		}
+
+		public function testRightAnswer() {
+			global $fishingData, $_SESSION;
+			$correctPrep = "cprep";
+			$correctNoun = "cnoun";
+			$_SESSION['fishing']['currentFish'] = 0;
+			$result = checkFishingAnswer($correctPrep,$correctNoun,$correctPrep,$correctNoun);
+				
+			$this->AssertTrue(is_string($result));
+			$this->AssertEquals(1,$_SESSION['fishing']['currentFish']);
+		}
 	}
 ?>

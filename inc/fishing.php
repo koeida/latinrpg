@@ -22,16 +22,18 @@
 			array("ABL"=> "pecuniā","ACC"=>"pecuniam")));
 	
 	function checkFishingAnswer($prepGuess,$nounGuess,$currentPrep,$currentNoun) {
-			if (($prepGuess == $currentPrep) && ($nounGuess == $currentNoun)) {
-				$_SESSION['fishing']['currentFish'] += 1;
-				$newData = newFishingRound($fishingData);
-				return $newData["fishx"].",".$newData['fishy'];
-			} else {
-				if($_SESSION['fishing']['currentFish'] > 0) {
-					$_SESSION['fishing']['currentFish'] -= 1;
-				}
-				return false;
+		global $fishingData;
+
+		if (($prepGuess == $currentPrep) && ($nounGuess == $currentNoun)) {
+			$_SESSION['fishing']['currentFish'] += 1;
+			$newData = newFishingRound($fishingData);
+			return $newData["fishx"].",".$newData['fishy'];
+		} else {
+			if($_SESSION['fishing']['currentFish'] > 0) {
+				$_SESSION['fishing']['currentFish'] -= 1;
 			}
+			return false;
+		}
 	}
 
 	function newFishingRound($fishingData) {
