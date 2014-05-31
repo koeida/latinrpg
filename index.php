@@ -122,6 +122,18 @@
 				sqlRun("CALL increment_currency(-200,".$_SESSION['uid'].",0)");
 				echo "TRUE";
 			}
+		} else if(F\contains($params,"getAllTreasure")) {
+			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
+			$res = sqlSelect($sqlTreasure);
+
+			$sqlDecorations = 'SELECT name,description,x,y FROM decorations'; 
+			$decRes = sqlSelect($sqlDecorations);
+			for($r = 0; $r < count($decRes); $r++) {
+				$decRes[$r]['x'] *= -24;
+				$decRes[$r]['y'] *= -24;
+			}
+
+			renderTemplate('templates/treasure.html',array('treasures' => $res, 'decorations' => $decRes));
 		} else if(F\contains($params,"getTreasure")) {
 			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
 			$res = sqlSelect($sqlTreasure);
