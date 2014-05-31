@@ -124,6 +124,7 @@
 		} else if(F\contains($params,"getTreasure")) {
 			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
 			$res = sqlSelect($sqlTreasure);
+
 			$decorationSize = -24;
 			$sqlDecorations = 'SELECT name,description,(x * '.$decorationSize.') as x,(y * '.$decorationSize.') as y FROM decorations WHERE id in (select decoration_id from users_decorations where user_id = '.$_SESSION['uid'].')';
 			$decRes = sqlSelect($sqlDecorations);

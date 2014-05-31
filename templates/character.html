@@ -205,12 +205,13 @@
 		}
 
 		function newDecGp() {
+			$('#NewDec')[0].style.visibility = 'hidden';
 			$.get('/stats/newDecGp', function(r) {
 				console.log(r);	
-			});
-			$.get('/stats/getTreasure',function(res) {
-				$('#main').empty();
-				$('#main').append(res);
+				$.get('/stats/getTreasure',function(res) {
+					$('#main').empty();
+					$('#main').append(res);
+				});
 			});
 		}
 	</script>
