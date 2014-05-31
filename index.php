@@ -3,7 +3,7 @@
 	require '/inc/Mustache.php';
 	require '/inc/functional/_import.php';
 	use Functional as F;
-	require '/javascripts/fishing.php';
+	require '/inc/fishing.php';
 
 	$login = function () {
 		if(isset($_POST['username'])) {
@@ -168,22 +168,14 @@
 		renderTemplate('templates/second_declension.html',$_SESSION);
 	};
 
+
 	$fish = function ($params) use ($fishingData) {
 		if(F\contains($params,"checkanswer")) {
 			$prepGuess = urlDecode($params[3]);
 			$nounGuess = urlDecode($params[4]);
 			$currentPrep = $_SESSION['fishing']['currentPrep']['name'];
 			$currentNoun = $_SESSION['fishing']['currentNoun']['name']; 
-			if (($prepGuess == $currentPrep) && ($nounGuess == $currentNoun)) {
-				$_SESSION['fishing']['currentFish'] += 1;
-				$newData = newFishingRound($fishingData);
-				echo $newData["fishx"].",".$newData['fishy'];
-			} else {
-				if($_SESSION['fishing']['currentFish'] > 0) {
-					$_SESSION['fishing']['currentFish'] -= 1;
-				}
-				printf("false");
-			}
+			printf(checkFishingAnswer($prepGuess,$nounGuess,$currentPrep,$currentNoun));
 		} else if (F\contains($params,"getPoints")) {
 			//return total, currentCaught
 			$currentCaught = $_SESSION['fishing']['currentFish'];

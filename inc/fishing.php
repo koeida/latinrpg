@@ -20,6 +20,19 @@
 			array("ABL"=> "malā",   "ACC"=>"malam"),
 			array("ABL"=> "gladiō", "ACC"=>"gladium"),
 			array("ABL"=> "pecuniā","ACC"=>"pecuniam")));
+	
+	function checkFishingAnswer($prepGuess,$nounGuess,$currentPrep,$currentNoun) {
+			if (($prepGuess == $currentPrep) && ($nounGuess == $currentNoun)) {
+				$_SESSION['fishing']['currentFish'] += 1;
+				$newData = newFishingRound($fishingData);
+				return $newData["fishx"].",".$newData['fishy'];
+			} else {
+				if($_SESSION['fishing']['currentFish'] > 0) {
+					$_SESSION['fishing']['currentFish'] -= 1;
+				}
+				return false;
+			}
+	}
 
 	function newFishingRound($fishingData) {
 		//Determine preposition
