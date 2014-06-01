@@ -89,6 +89,17 @@ function concatWith($a,$s) {
 	return substr($res,1);
 }
 
+function concat($a) {
+	return F\reduce_left($a,function($val,$i,$c,$red) {
+			return $red . $val;
+	},"");
+};
+
+function concatMap($a,$f) {
+	$mapped = F\map($a,$f);
+	return concat($mapped);
+}
+
 function mapWhen($a,$filterF,$mapF) {
 	$filtered = F\filter($a,$filterF);
 	$mapped = F\map($filtered,$mapF);

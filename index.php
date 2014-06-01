@@ -50,7 +50,20 @@
 		}
 	}
 
+	function getAchievementTemplate($completed,$title,$desc,$iconUrl) {
+		$template = 'templates/displayAchievement.html';
+		$class = ($completed) ? "complete" : "incomplete";
+		$icon = ($completed) ? $iconUrl : substr($iconUrl,0,-4)."_no.png";
+		
+		return renderTemplateNE($template,array(
+					"Class" => $class,
+					"Title" => $title,
+					"Description" => $desc,
+					"IconUrl" => $icon));
+	}
+
 	function getAchievementList($uid) {
+		$achievementInfo = sqlSelect("SELECT * from quests");
 		$points = ($uid == '') ? array() : getPoints($uid);
 		$reqs = array(
 				array("id" => 0, "req" => 25, "achievement_id" => 0), //Fishing1 
@@ -58,36 +71,22 @@
 				array("id" => 1, "req" => 25, "achievement_id" => 2), //EasyMonst
 				array("id" => 2, "req" => 25, "achievement_id" => 3), //HardMonst
 				array("id" => 3, "req" =>  6, "achievement_id" => 4)); //Words1
-
-
+		
+		//Get list of completed achievement ids 
 		$achievements = F\filter($reqs,function($r) use ($points) {
 			return requirementsSatisfied($points,$r['id'],$r['req']);
 		});
 		$achievementIds = F\pluck($achievements,'achievement_id');
-		
-		//Get html for completed achievements
-		$sql = "SELECT description, badgeUrl, id, requirements, name FROM quests";
-		$sqlRes = sqlSelect($sql);
-		$res = array_reduce($sqlRes,function ($carry, $e) use ($achievementIds) {
-			$template = 'templates/displayAchievement.html';
-			$title = $e['name'];
-			$makeTemp = function ($class,$title,$desc,$icon) use ($template) {
-				return renderTemplateNE($template,array(
-					"Class" => $class,
-					"Title" => $title,
-					"Description" => $desc,
-					"IconUrl" => $icon));
-			};
 
-			if(F\contains($achievementIds,intval($e['id']))) {
-				return $carry . $makeTemp("complete",$title, $e['description'],$e['badgeUrl']);
-			} else {
-				$img = substr($e['badgeUrl'],0,-4)."_no.png";
-				return $carry . $makeTemp("incomplete",$title,$e['requirements'],$img);
-			}
-		},"");
+		//Generate HTML for complete and incomplete achievements	
+		$html = concatMap($achievementInfo,function ($a) use ($achievementIds) { 
+			$name = $a['name'];
+			$desc = $a['description'];
+			$iconUrl = $a['badgeUrl'];
+			$isComplete = F\contains($achievementIds,intval($a['id']));
+			return getAchievementTemplate($isComplete,$name,$desc,$iconUrl);});
 
-		return $res;
+		return $html;
 	}
 
 	function getUserGold($uid) {
