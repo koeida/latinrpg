@@ -81,4 +81,17 @@ function firstDict($d,$key,$f) {
 	$res = array_values(filterDict($d,$key,$f));
 	return (count($res) > 0) ? $res[0] : array();
 }
+
+function concatWith($a,$s) {
+	$res = F\reduce_left($a,function($val,$i,$c,$red) use ($s) {
+			return $red . $s . $val;
+	},"");
+	return substr($res,1);
+}
+
+function mapWhen($a,$filterF,$mapF) {
+	$filtered = F\filter($a,$filterF);
+	$mapped = F\map($filtered,$mapF);
+	return $mapped;
+}
 ?>

@@ -14,7 +14,6 @@
 					$_SESSION['uid'] = $res[0]['id'];
 				}
 			}
-
 		} 
 		if(!isset($_SESSION['uid'])) {
 			renderTemplate("templates/login.html",array());
@@ -36,20 +35,13 @@
 	}
 
 	function getPoints($uid) {
-		$sql = "select number, point_id from points_users where user_id = '$uid'";
+		$sql = "select point_id, number from points_users where user_id = '$uid'";
 		$res = sqlSelect($sql);
 		return $res;
 	}
 
-	function concatWith($a,$s) {
-		$res = F\reduce_left($a,function($val,$i,$c,$red) use ($s) {
-			return $red . $s . $val;
-		},"");
-		return substr($res,1);
-	}
-
-	function requirementsSatisfied($points,$colname,$id,$pointsRequirement) {
-		$res = firstDict($points,$colname,function($x) use ($id) {return $x == $id;});
+	function requirementsSatisfied($points,$id,$pointsRequirement) {
+		$res = firstDict($points,'point_id',function($x) use ($id) {return $x == $id;});
 		$number = $res['number'];
 		if($number >= $pointsRequirement) {
 			return true;
@@ -66,20 +58,17 @@
 				array("id" => 1, "req" => 25, "achievement_id" => 2), //EasyMonst
 				array("id" => 2, "req" => 25, "achievement_id" => 3), //HardMonst
 				array("id" => 3, "req" =>  6, "achievement_id" => 4)); //Words1
-		
-		$achievements = array_reduce($reqs,function ($carry,$e) use ($points) {
-			if(requirementsSatisfied($points,'point_id',$e['id'],$e['req'])) {
-				array_push($carry,$e['achievement_id']);
-				return $carry;
-			} else {
-				return $carry;
-			}
-		},array());
 
+
+		$achievements = F\filter($reqs,function($r) use ($points) {
+			return requirementsSatisfied($points,$r['id'],$r['req']);
+		});
+		$achievementIds = F\pluck($achievements,'achievement_id');
+		
 		//Get html for completed achievements
 		$sql = "SELECT description, badgeUrl, id, requirements, name FROM quests";
 		$sqlRes = sqlSelect($sql);
-		$res = array_reduce($sqlRes,function ($carry, $e) use ($achievements) {
+		$res = array_reduce($sqlRes,function ($carry, $e) use ($achievementIds) {
 			$template = 'templates/displayAchievement.html';
 			$title = $e['name'];
 			$makeTemp = function ($class,$title,$desc,$icon) use ($template) {
@@ -90,7 +79,7 @@
 					"IconUrl" => $icon));
 			};
 
-			if(F\contains($achievements,intval($e['id']))) {
+			if(F\contains($achievementIds,intval($e['id']))) {
 				return $carry . $makeTemp("complete",$title, $e['description'],$e['badgeUrl']);
 			} else {
 				$img = substr($e['badgeUrl'],0,-4)."_no.png";
