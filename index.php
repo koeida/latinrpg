@@ -101,28 +101,39 @@
 		return $res;
 	}
 
+	function getUserGold($uid) {
+		$sqlGold = "CALL GetUserCurrency(0,${uid})";
+		$goldResult = sqlSelect($sqlGold);
+		$gp = intval($goldResult[0]['amount']);
+		return $gp;
+	}
+
+	function getPossibleDecorations($uid) {
+		$sqlPossibleNewDecorations = "CALL getUserDecorations(${uid})";
+		$possibleDecorations = sqlSelect($sqlPossibleNewDecorations);
+		return $possibleDecorations;
+	}
+
 	$stats = function ($params) {
 		if(F\contains($params,"getAchievementsXml")) {
 			echo getAchievementList($_SESSION['uid']);
 		} else if(F\contains($params,"home")) {			
 			renderTemplate("templates/home.html",array());
-		} else if(F\contains($params,"newDecGp")) {			
-			$sqlGold = "select amount from users_currencies where currency_id = 0 and user_id = ".$_SESSION['uid'];
-			$sqlPossibleNewDecorations = "select * from decorations where id not in (select decoration_id from users_decorations where user_id = ".$_SESSION['uid'].")";
-			$goldRes = sqlSelect($sqlGold);
-			$gp = intval($goldRes[0]['amount']);
-			$newDecRes = sqlSelect($sqlPossibleNewDecorations);
+		} else if(F\contains($params,"newDecGp")) { //Purchase new decoration with GP
+			$gp = getUserGold($_SESSION['uid']);
+			$possibleDecorations = getPossibleDecorations($_SESSION['uid']);
 			$decorationCost = 200;
-			if ($gp < $decorationCost || count($newDecRes) == 0) {
+
+			if ($gp < $decorationCost || count($possibleDecorations) == 0) {
 				echo "FALSE";
 			} else {
-				$newDec = getRandomFrom($newDecRes,null);
-				sqlRun("INSERT INTO users_decorations (user_id, decoration_id) VALUES (".$_SESSION['uid'].",".$newDec['id'].")");
+				$newDecoration = getRandomFrom($possibleDecorations,null);
+				sqlRun("CALL addUserDecoration(${_SESSION['uid']},${newDecoration}");
 				sqlRun("CALL increment_currency(-".$decorationCost.",".$_SESSION['uid'].",0)");
 				echo "TRUE";
 			}
 		} else if(F\contains($params,"getTreasure")) {
-			$sqlTreasure = 'SELECT name,description,iconpath,amount from currencies,users_currencies where user_id = '.$_SESSION['uid'].' and currency_id = id';
+			$sqlTreasure = "CALL getUserCurrencies(${_SESSION['uid']})";
 			$res = sqlSelect($sqlTreasure);
 
 			$decorationSize = -24;
