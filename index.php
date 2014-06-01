@@ -49,7 +49,7 @@
 	}
 
 	function requirementsSatisfied($points,$colname,$id,$pointsRequirement) {
-		$res = F\First($points, function($x) use ($colname,$id) {return $x[$colname] == $id;});
+		$res = firstDict($points,$colname,function($x) use ($id) {return $x == $id;});
 		$number = $res['number'];
 		if($number >= $pointsRequirement) {
 			return true;

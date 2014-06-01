@@ -71,4 +71,14 @@ function mapDict($d,$key,$f) {
 	});
 }
 
+function filterDict($d,$key,$f) {
+	return F\filter($d,function ($a) use ($key,$f) {
+		return $f($a[$key]); 
+	});
+}
+
+function firstDict($d,$key,$f) {
+	$res = array_values(filterDict($d,$key,$f));
+	return (count($res) > 0) ? $res[0] : array();
+}
 ?>
