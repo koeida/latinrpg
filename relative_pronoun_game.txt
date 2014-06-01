@@ -1,0 +1,77 @@
+Marcus, qui puellam pulsat, improbus est.
+Quis improbus est?
+Quis pulsat?
+
+Marcus, quem puella pulsat, improbus est.
+Quis improbus est?
+Quis pulsat?
+
+Puella quae plorat est Iulia
+
+Aemilia, quam Iulia vocat, mater liberorum est.
+
+Puer quem Aemilia verberat est Marcus
+
+Medus baculum, quod in mensa est, videt.
+
+Medus, qui abest, eum non audit neque venit.
+
+Syra, quae bona ancilla est, nasum magnum et foedum habet.
+
+Aemilia, quae iam sola est in peristylo, ancillas vocat.
+
+Servi qui lecticam portant sunt Ursus et Davus.
+
+Sacci quos Syrus et Leander portant magni sunt.
+
+Seccus quem Syrus portat non magnus est.
+
+Medus est malus servus qui nummos domini in sacculo suo habet.
+
+Patterns:
+[Noun1:Nom] [Rel:Nom] [Noun2: Acc] [Verb1] [Verb2] [Noun3:Acc]
+Iulius       qui        vaccam    amat  habet    gladium  
+
+[Interrog:Acc] [Verb] [Noun1]
+Quem Iulius amat?
+[Interrog:Nom] [Verb2] [Noun3]
+Quis gladium habet?
+[Interrog:Acc] [Verb2] [Noun1]
+Quem habet gladium?
+
+declensions
+0 1st dec
+1 2nd dec m
+2 2nd dec n
+3 3rd dec m/f
+4 3rd dec n
+
+cases
+0 nom
+1 gen
+2 dat
+3 acc
+4 abl
+5 voc
+
+number
+0 sg
+1 pl
+
+declensions_endings
+dec case num ending
+0 0 0 a
+0 1 0 ae
+0 2 0 ae
+0 3 0 am
+0 4 0 a
+0 0 1 ae
+0 1 1 arum
+0 2 1 is
+0 3 1 as
+0 4 1 is
+0 4 1 is
+
+nominative,stem,decl
+gladius,gladi,1
+insula, insul, 0
